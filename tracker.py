@@ -299,6 +299,7 @@ def generate_daily_suggestions():
     notion_create_page(DB_SUGGESTIONS, {
         "Titre": prop_title(f"Suggestions du {today_str}"),
         "Date": prop_date(now_utc().strftime("%Y-%m-%d")),
+        "Date de l'analyse": prop_date(now_utc().strftime("%Y-%m-%d")),
         "Type": prop_select("Suggestions quotidiennes"),
     }, children)
     print(f"  ✅ Suggestions créées pour le {today_str}")
@@ -372,6 +373,7 @@ OBJECTIF SEMAINE PROCHAINE : [1 objectif concret]"""
     notion_create_page(DB_SUGGESTIONS, {
         "Titre": prop_title(f"Rapport semaine du {week_str}"),
         "Date": prop_date(now_utc().strftime("%Y-%m-%d")),
+        "Date de l'analyse": prop_date(now_utc().strftime("%Y-%m-%d")),
         "Type": prop_select("Rapport hebdomadaire"),
     }, children)
     print(f"  ✅ Rapport hebdomadaire créé")
@@ -482,6 +484,7 @@ def process_ig_videos():
             update_hook_tracker(hook, views)
 
 def update_hook_tracker(hook_text, views):
+    today = now_utc().strftime("%Y-%m-%d")
     pages = notion_get_all_pages(DB_HOOKS)
     for p in pages:
         title = p.get("properties", {}).get("Hook", {}).get("title", [])
@@ -490,12 +493,14 @@ def update_hook_tracker(hook_text, views):
             notion_update_page(p["id"], {
                 "Use or not ?": prop_select("utilisé"),
                 "Impact en vue": prop_number(max(current, views)),
+                "Date de l'utilisation du hook": prop_date(today),
             })
             return
     notion_create_page(DB_HOOKS, {
         "Hook": prop_title(hook_text),
         "Use or not ?": prop_select("utilisé"),
         "Impact en vue": prop_number(views),
+        "Date de l'utilisation du hook": prop_date(today),
     })
 
 # ── LinkedIn ──────────────────────────────────────────────────────────────────
@@ -518,3 +523,4 @@ if __name__ == "__main__":
     if is_monday():
         generate_weekly_report()
     print("\n✅ Tracking terminé !")
+    
